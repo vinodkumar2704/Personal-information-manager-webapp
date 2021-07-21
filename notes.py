@@ -1,18 +1,24 @@
-import requests
-import bs4
-import sys
-import psycopg2
 
 
+from flask import Blueprint
+from flask import render_template,request
 
-def create_db():
-    dbconn = psycopg2.connect("dbname = pim")
+from flask import g
+from . import db
+
+
+bp = Blueprint("notes","pim_app",url_prefix="")
+
+@bp.route("/")
+def dashboard():
+    dbconn = db.get_db()
     cursor = dbconn.cursor()
-    with open("pim.sql") as f:
-        sql_code = f.read()
-    cursor.execute(sql_code)
+    oby = request.args.get("order_by","date")
+    order = request.args.get("order","asc")
+    cursor.execute("select created_on,title from notes")
+    n_lists=cursor.fetchall()
+    
     dbconn.commit()
-
-
-create_db()
+    
+    return render_template("notes.html",notes=n_lists)
 
