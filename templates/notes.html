@@ -1,0 +1,22 @@
+{% extends "index.html" %}
+{% block body %}
+    
+
+    <p>
+            <table class="table table-striped">
+              <thead class="thead-dark">
+              <tr>
+                <th scope="col"> <a href="/?order_by=name&order={{order}}">Name</a>  </th>
+                <th scope="col"> <a href="/?order_by=date&order={{order}}">Date</a> </th>
+              </thead>
+              {% for  created_on, title in notes %}
+              <tr>              
+                <td scope="row" class="title"><a href="#">{{title}} </a></td>
+                <td class="date">{{created_on}}</td>
+              </tr>
+              {%endfor%}
+            </table>
+          </p>
+    
+    
+{% endblock %}
