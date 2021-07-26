@@ -38,18 +38,19 @@ def init_db():
     
     faker = Faker() # Used to create dummy date
     cur = db.cursor()
-    
-    description = "hello hi good morning."
-    bought = datetime.datetime.strptime(faker.date(), '%Y-%m-%d').date()
-    title = "rick and morty"
-    
-    cur.execute("INSERT INTO notes (created_on,title,description) VALUES (%s,%s,%s)",(bought,title,description))
+    for i in range(3):
+        
+        description = "hello hi good morning."
+        bought = datetime.datetime.strptime(faker.date(), '%Y-%m-%d').date()
+        title = "rick and morty"
+        
+        cur.execute("INSERT INTO notes (created_on,title,description) VALUES (%s,%s,%s)",(bought,title[i:],description[i:]))
+        tag = "summer"
+        cur.execute("INSERT INTO hashtags (tag) VALUES (%s)",(tag[i:],))
+        cur.execute("insert into links (notes_id,tag_id) values (%s,%s)",(i+1,i+1))
+            
     click.echo("notes added")
 
-    tag = "summer"
-    cur.execute("INSERT INTO hashtags (tag) VALUES (%s)",(tag,))
-    cur.execute("insert into links (notes_id,tag_id) values (1,1)")
-            
     click.echo("tags and links added")
     cur.close()
     db.commit()

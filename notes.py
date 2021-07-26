@@ -1,10 +1,11 @@
 
 
 from flask import Blueprint
-from flask import render_template,request
-
+from flask import render_template,request,jsonify,redirect,url_for
+import psycopg2
 from flask import g
 from . import db
+from datetime import date
 
 
 bp = Blueprint("notes","pim_app",url_prefix="")
@@ -14,11 +15,78 @@ def dashboard():
     dbconn = db.get_db()
     cursor = dbconn.cursor()
     oby = request.args.get("order_by","date")
-    order = request.args.get("order","asc")
-    cursor.execute("select created_on,title from notes")
+    order = request.args.get("order","desc")
+    if order == "asc":
+        cursor.execute("select id,created_on,title from notes order by created_on")
+    else:
+        
+        cursor.execute("select id,created_on,title from notes order by created_on desc")
     n_lists=cursor.fetchall()
+    print(n_lists)
     
     dbconn.commit()
     
-    return render_template("notes.html",notes=n_lists)
+    return render_template("notes.html",notes=n_lists,order = "desc" if order=="asc" else "asc")
 
+
+@bp.route("/<tid>/info")
+def notes_info(tid): 
+    conn = db.get_db()
+    cursor = conn.cursor()
+    cursor.execute("select created_on,title,description from notes where id = %s",(tid,))
+    notes_info = cursor.fetchone()
+    
+    if not notes_info :
+        return render_template("notes_info.html"),404
+        
+    cursor.execute("select t.tag from notes n,hashtags t,links l where l.notes_id = %s and t.id = l.tag_id", (tid,))
+    tags = (x[0] for x in cursor.fetchall())
+    date, title, description = notes_info 
+    data = dict(id = tid,
+                name = title,
+                sold = date,
+                description = description, 
+                tags = tags)
+    return render_template("notes_info.html", **data)
+    
+    
+    
+@bp.route("/new" ,  methods=["GET", "POST",])
+def new_notes():
+    if request.method == "GET":return render_template("new_notes.html")
+    elif request.method == "POST":
+        title = request.form.get("title")
+        description=request.form.get("description")
+        hashtags=request.form.get("hashtags")
+        tags = hashtags.splitlines()
+        
+        today = date.today()
+        
+        dbconn = db.get_db()
+        cursor = dbconn.cursor()
+        cursor.execute("INSERT INTO notes (created_on,title,description) VALUES (%s,%s,%s)",(today,title,description))
+        cursor.execute("select id from notes where title = (%s)",(title,))
+        title_id = int(cursor.fetchone()[0])
+        print(title_id,"id")
+        for tag in tags:
+            cursor.execute("INSERT INTO hashtags (tag) VALUES (%s)",(tag,))
+            cursor.execute("select id from hashtags where tag = (%s)",(tag,))
+            tag_id = int(cursor.fetchone()[0])
+            cursor.execute("INSERT INTO links (notes_id,tag_id) values (%s,%s)",(title_id,tag_id))
+        cursor.close()
+        dbconn.commit()
+        print("Today's date:", today)
+        print(tags)
+        print(title,description,hashtags)
+ 
+  
+    return redirect(url_for("notes.dashboard"), 302)
+    
+    
+    
+    
+    
+    
+    
+    
+    

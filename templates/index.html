@@ -4,14 +4,17 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!--fonts-->
-    
+     <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Dosis:wght@700&display=swap" rel="stylesheet">
 	
 	
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <i class="bi bi-plus-square"></i>
+    <i class="bi bi-pencil-fill"></i>
     
-    <link href="{{ url_for('static', filename='main.css') }}" type="text/css" rel="stylesheet"/>
+ <link href="{{ url_for('static', filename='main.css') }}" type="text/css" rel="stylesheet"/>
     <title>My information</title>
   </head>
   <body>   
@@ -19,7 +22,7 @@
   <header>
    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
   <div class="container-fluid">
-    <a class="navbar-brand" href="#">Infi</a>
+    <a class="navbar-brand" href="/">Infi</a>
     
       <form class="d-flex">
         <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
@@ -31,18 +34,13 @@
       </div>
     </div>
     </header>
+    
     <section>
-    <button class="button button1">
-    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-plus-square-fill" viewBox="0 0 16 16">
-  <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm6.5 4.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3a.5.5 0 0 1 1 0z"/>
-</svg>
-              ADD NEW 
-     </button>
-
-
     {% block body %}
+
     {% endblock%}
-    </section>
+    </section>   
+     
   </body>
 </html>
 
