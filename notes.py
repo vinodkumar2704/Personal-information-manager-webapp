@@ -10,22 +10,42 @@ from datetime import date
 
 bp = Blueprint("notes","pim_app",url_prefix="")
 
-@bp.route("/")
+@bp.route("/",methods = ["GET","POST",])
 def dashboard():
     dbconn = db.get_db()
     cursor = dbconn.cursor()
-    oby = request.args.get("order_by","date")
-    order = request.args.get("order","desc")
-    if order == "asc":
-        cursor.execute("select id,created_on,title from notes order by created_on")
-    else:
+    if request.method == "GET":
+        oby = request.args.get("order_by","date")
+        order = request.args.get("order","desc")
+        if order == "asc":
+            cursor.execute("select id,created_on,title from notes order by created_on")
+        else:
+            
+            cursor.execute("select id,created_on,title from notes order by created_on desc")
+        n_lists=cursor.fetchall()
         
-        cursor.execute("select id,created_on,title from notes order by created_on desc")
-    n_lists=cursor.fetchall()
-    
-    dbconn.commit()
-    
-    return render_template("notes.html",notes=n_lists,order = "desc" if order=="asc" else "asc")
+        dbconn.commit()
+        
+        return render_template("notes.html",notes=n_lists,order = "desc" if order=="asc" else "asc")
+    elif request.method == "POST":
+         search = request.form.get("search")
+         print(search)
+         if search:
+            oby = request.args.get("order_by","date")
+            order = request.args.get("order","desc")
+            search = '%'+search+'%'
+            if order == "asc":
+                cursor.execute("select id,created_on,title from notes where title like (%s) order by created_on",(search,))
+            else:
+                
+                cursor.execute("select id,created_on,title from notes where title like (%s) order by created_on desc",(search,))
+            n_lists=cursor.fetchall()
+            dbconn.commit()
+            print(n_lists)
+            return render_template("notes.html",notes=n_lists,order = "desc" if order=="asc" else "asc")
+            
+         else:
+            return redirect(url_for("notes.dashboard"), 302)
 
 
 @bp.route("/<tid>/info")
@@ -118,5 +138,36 @@ def edit(tid):
     
     
     
+@bp.route("/searchresults")
+def search_results(search):
+    dbconn = db.get_db()
+    cursor = dbconn.cursor()
     
+    cursor.execute("select title,created_on from notes where {{search}} in (select title from notes)")
+    
+    
+    
+    
+    
+    return rendertemplate("search_results.html",**search_list)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     
