@@ -1,0 +1,30 @@
+{% extends "index.html" %}
+{% block body %} 
+<div class = "new_notes">
+<form action="{{url_for('notes.edit',tid=tid)}}" method="POST" id = "my-form">
+  <div class="form-column">
+    <div class="form-group col-md-6">
+      <label for="title">Title</label>
+      <input type="text" class="form-control" id="inputtitle" name="title" value ="{{title}}">
+    </div>
+  </div>
+    <label for = "description" id = data class="form-label">Description</label><br/>
+    <textarea rows="10" id="description" class="form-control"
+              name="description">{{description}}</textarea>
+
+   <label for = "hashtags" id = tags class="form-label">Hashtags (Enter each hashtag in new line)</label><br/>
+    <textarea rows="5" id="hashtags" class="form-control"
+              name="hashtags">{{hashtags}}</textarea>
+
+  <div class="mb-3">
+    <button type="submit" class="btn btn-primary" id = submit_btn>Submit</button>
+  </div>
+
+
+
+</form>
+
+
+
+
+{% endblock %}

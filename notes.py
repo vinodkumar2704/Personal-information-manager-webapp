@@ -22,7 +22,6 @@ def dashboard():
         
         cursor.execute("select id,created_on,title from notes order by created_on desc")
     n_lists=cursor.fetchall()
-    print(n_lists)
     
     dbconn.commit()
     
@@ -39,12 +38,12 @@ def notes_info(tid):
     if not notes_info :
         return render_template("notes_info.html"),404
         
-    cursor.execute("select t.tag from notes n,hashtags t,links l where l.notes_id = %s and t.id = l.tag_id", (tid,))
+    cursor.execute("select t.tag from notes n,hashtags t,links l where n.id = %s and l.notes_id = %s and t.id = l.tag_id", (tid,tid))
     tags = (x[0] for x in cursor.fetchall())
     date, title, description = notes_info 
-    data = dict(id = tid,
+    data = dict(tid = tid,
                 name = title,
-                sold = date,
+                date = date,
                 description = description, 
                 tags = tags)
     return render_template("notes_info.html", **data)
@@ -67,24 +66,55 @@ def new_notes():
         cursor.execute("INSERT INTO notes (created_on,title,description) VALUES (%s,%s,%s)",(today,title,description))
         cursor.execute("select id from notes where title = (%s)",(title,))
         title_id = int(cursor.fetchone()[0])
-        print(title_id,"id")
+        
         for tag in tags:
-            cursor.execute("INSERT INTO hashtags (tag) VALUES (%s)",(tag,))
-            cursor.execute("select id from hashtags where tag = (%s)",(tag,))
+            cursor.execute("INSERT INTO hashtags (tag) VALUES (%s) ON CONFLICT DO NOTHING",(tag,))
+            cursor.execute("select id from hashtags where tag = (%s) ",(tag,))
             tag_id = int(cursor.fetchone()[0])
-            cursor.execute("INSERT INTO links (notes_id,tag_id) values (%s,%s)",(title_id,tag_id))
+            cursor.execute("INSERT INTO links (notes_id,tag_id) values (%s,%s) ON CONFLICT (notes_id,tag_id) DO NOTHING",(title_id,tag_id))
         cursor.close()
         dbconn.commit()
-        print("Today's date:", today)
-        print(tags)
-        print(title,description,hashtags)
  
   
     return redirect(url_for("notes.dashboard"), 302)
     
     
     
-    
+
+@bp.route("/<tid>/edit" ,  methods=["GET", "POST",])
+def edit(tid):
+    dbconn = db.get_db()
+    cursor = dbconn.cursor()
+    if request.method == "GET":
+        cursor.execute("select title,description from notes where id = %s",(tid,))
+        notes_info = cursor.fetchone()
+        
+        cursor.execute("select t.tag from notes n,hashtags t,links l where n.id = %s and l.notes_id = %s and t.id = l.tag_id", (tid,tid))
+        tags = (x[0] for x in cursor.fetchall())
+        tags = "\r\n".join(tags)
+        title, description = notes_info 
+        data = dict(tid = tid,
+                    title = title,
+                    description = description, 
+                    hashtags = tags)
+        return render_template("notes_edit.html", **data)
+        
+    elif request.method == "POST":
+        title = request.form.get("title")
+        description=request.form.get("description")
+        hashtags=request.form.get("hashtags")
+        tags = hashtags.splitlines()
+        
+        cursor.execute("update notes set title=(%s),description = (%s) where id = (%s)" ,(title,description,tid))
+        for tag in tags:
+            cursor.execute("INSERT INTO hashtags (tag) VALUES (%s) ON CONFLICT DO NOTHING",(tag,))
+            cursor.execute("select id from hashtags where tag = (%s)",(tag,))
+            tag_id = int(cursor.fetchone()[0])
+            cursor.execute("INSERT INTO links (notes_id,tag_id) values (%s,%s) ON CONFLICT DO NOTHING",(tid,tag_id))
+        cursor.close()
+        dbconn.commit()
+  
+    return redirect(url_for("notes.notes_info",tid = tid), 302)
     
     
     

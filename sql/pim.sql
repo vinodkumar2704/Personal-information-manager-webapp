@@ -14,7 +14,7 @@ CREATE TABLE notes(
 
 CREATE TABLE hashtags(
     id serial PRIMARY KEY,
-    tag varchar(20)
+    tag varchar(20) UNIQUE
     
 );
 
@@ -23,5 +23,7 @@ CREATE TABLE links(
     notes_id INTEGER,
     tag_id INTEGER,
     FOREIGN KEY (notes_id) references notes(id) ON DELETE CASCADE,
-    FOREIGN KEY (tag_id) references hashtags(id) ON DELETE CASCADE
+    FOREIGN KEY (tag_id) references hashtags(id) ON DELETE CASCADE,
+    UNIQUE (notes_id,tag_id)
+    
 );
