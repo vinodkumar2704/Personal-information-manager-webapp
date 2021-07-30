@@ -1,0 +1,35 @@
+{% extends "index.html" %}
+
+
+
+{% block body %}
+<div class = 'hashtagbox'>
+    <p style = "font-size:32px"> ALL HASHTAGS</p>
+    {% for t in all_tags %}
+    
+  <a class="tag" href="{{url_for('notes.taglist',tag=t)}}"><span class="badge bg-secondary">#{{t[0]}}</span></a>
+  {% endfor %}
+  </div>
+    {%if notes %}
+
+    <p>
+            <table class="table table-striped">
+              <thead class="thead-dark">
+              <tr>
+                <th scope="col"> Title of notes </th>
+                <th scope="col"> <a href="/{{tag}}/list?order_by=date&order={{order}}">Date</a> </th>
+              </thead>
+              {% for  id,created_on, title in notes %}
+              <tr>              
+                <td scope="row" class="title"><a href="{{url_for('notes.notes_info',tid = id)}}">{{title}} </a></td>
+                <td class="date">{{created_on}}</td>
+              </tr>
+              {%endfor%}
+            </table>
+          </p>
+      {% else %}
+      
+      NOTFOUND
+        {%endif%}
+    
+{% endblock %}

@@ -8,9 +8,9 @@
 <p>
   <h6 class="bought">Created on {{date}} </h6>
   </h6>
-  <p id = hashtags>Hashtags 
+  <p id = hashtags ">HASHTAGS :    </br> 
   {% for t in tags %}
-  <a class="tag" href="#"><span class="badge bg-secondary">#{{t}}</span></a>
+  <a class="tag" href="{{url_for('notes.taglist',tag=t)}}"><span class="badge bg-secondary">#{{t}}</span></a>
   {% endfor %}
   </p>
 </p>

@@ -48,25 +48,27 @@ def dashboard():
             return redirect(url_for("notes.dashboard"), 302)
 
 
-@bp.route("/<tid>/info")
+@bp.route("/<tid>/info" ,  methods=["GET", "POST",])
 def notes_info(tid): 
     conn = db.get_db()
     cursor = conn.cursor()
     cursor.execute("select created_on,title,description from notes where id = %s",(tid,))
     notes_info = cursor.fetchone()
-    
-    if not notes_info :
-        return render_template("notes_info.html"),404
-        
-    cursor.execute("select t.tag from notes n,hashtags t,links l where n.id = %s and l.notes_id = %s and t.id = l.tag_id", (tid,tid))
-    tags = (x[0] for x in cursor.fetchall())
-    date, title, description = notes_info 
-    data = dict(tid = tid,
-                name = title,
-                date = date,
-                description = description, 
-                tags = tags)
-    return render_template("notes_info.html", **data)
+    if request.method == 'GET':
+        if not notes_info :
+            return render_template("notes_info.html"),404
+            
+        cursor.execute("select t.tag from notes n,hashtags t,links l where n.id = %s and l.notes_id = %s and t.id = l.tag_id", (tid,tid))
+        tags = (x[0] for x in cursor.fetchall())
+        date, title, description = notes_info 
+        data = dict(tid = tid,
+                    name = title,
+                    date = date,
+                    description = description, 
+                    tags = tags)
+        return render_template("notes_info.html", **data)
+    elif request.method == 'POST':
+        return 'success'
     
     
     
@@ -137,19 +139,27 @@ def edit(tid):
     return redirect(url_for("notes.notes_info",tid = tid), 302)
     
     
-    
-@bp.route("/searchresults")
-def search_results(search):
+
+@bp.route("/<tag>/list")
+def taglist(tag):
     dbconn = db.get_db()
     cursor = dbconn.cursor()
+    oby = request.args.get("order_by","date")
+    order = request.args.get("order","desc")
+    tag = tag
+    cursor.execute("select tag from hashtags")
+    all_tags = cursor.fetchall()
+    print(all_tags)
+    if order == "asc":
+        cursor.execute("select n.id,n.created_on,n.title from notes n ,hashtags t,links l where n.id = l.notes_id and t.id = l.tag_id and t.tag = (%s) order by n.created_on",(tag,))
+    else:
+        
+        cursor.execute("select n.id,n.created_on,n.title from notes n ,hashtags t,links l where n.id = l.notes_id and t.id = l.tag_id and t.tag = (%s) order by n.created_on desc",(tag,))
+    n_lists=cursor.fetchall()
+    dbconn.commit()
+    print(n_lists)
+    return render_template("tagsearch.html",notes=n_lists,tag=tag,all_tags=all_tags,order = "desc" if order=="asc" else "asc")
     
-    cursor.execute("select title,created_on from notes where {{search}} in (select title from notes)")
-    
-    
-    
-    
-    
-    return rendertemplate("search_results.html",**search_list)
 
 
 
