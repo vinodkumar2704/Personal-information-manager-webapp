@@ -1,11 +1,7 @@
 
 
-# Other modules can import this and use the functions here. 
 import psycopg2
 
-# click is a library installed as a dependency of flask which is used
-# to add extra commands to the flask executable. We already have
-# "flask run" but we can add more commands like "flask initdb" etc.
 import click 
 from flask import current_app, g
 from flask.cli import with_appcontext
