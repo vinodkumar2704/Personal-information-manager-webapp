@@ -23,7 +23,7 @@ features are supported
    
 # Setting up
 
-1. Clone repository
+1. Clone repository and rename it to pim_app
    1.  Create a virtualenv and activate it
 1. Install dependencies using `pip install -r requirements.txt`
 1. create db "pim" in sqlterminal using "CREATE DATABASE pim;"
