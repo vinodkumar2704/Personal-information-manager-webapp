@@ -26,7 +26,7 @@ features are supported
 1. Clone repository
    1.  Create a virtualenv and activate it
 1. Install dependencies using `pip install -r requirements.txt`
-1. create db "pim" in sqlterminal using "CREATE DATABASE pim;"
+1. create postgres db "pim" in sqlterminal using "CREATE DATABASE pim;"
 1. `export FLASK_APP=pim_app` to set the application
 1. `flask initdb` to create the initial database
 1. `flask run` to start the app.
