@@ -1,1 +1,1 @@
-web: gunicorn --workers 5 app:pim_app
+web: gunicorn --workers 5 wsgi:gunicorn_app
