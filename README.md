@@ -1,4 +1,4 @@
-# Peersonal-information-manager-webapp
+# Personal-information-manager-webapp
 
 # Introduction
 
